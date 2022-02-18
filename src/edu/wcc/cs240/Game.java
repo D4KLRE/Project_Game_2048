@@ -1,12 +1,11 @@
 package edu.wcc.cs240;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Color;
 
 /**
  * 2048 Game
@@ -17,22 +16,28 @@ import java.awt.Color;
  */
 public class Game extends JPanel implements KeyListener
 {
-    static Game game = new Game();
-    static JFrame frame = new JFrame("2048 Game");
+    static Game game;
+    static JFrame frame;
+    static Grid grid;
     static int gridSize = 4;
     static int windowHeight;
     static int windowWidth;
 
     public static void main(String[] args)
     {
-        setUpGUI();
+        setup();
     }
 
     /**
      * set up GUI based on the given grid size
      */
-    public static void setUpGUI()
+    public static void setup()
     {
+        game = new Game();
+        frame = new JFrame("2048 Game");
+        grid = new Grid(gridSize);
+//        grid.tileArray[0][0] = 2;
+
         //leave space between window border and grid border
         windowWidth = 50 * gridSize + 400;
         windowHeight = 50 * gridSize + 200;
@@ -42,6 +47,67 @@ public class Game extends JPanel implements KeyListener
         frame.setSize(windowWidth, windowHeight);
         frame.setVisible(true);
         frame.setResizable(false);
+        frame.setLayout(null);
+
+        addRestartButton();
+        addDestroyButton();
+
+//        JTextField textField = new JTextField("" + gridSize);
+//        textField.setBounds(25,140,100,30);
+//        frame.add(textField);
+    }
+
+    public static void addRestartButton()
+    {
+        JButton buttonRestart = new JButton("Restart");
+        buttonRestart.setBounds(25,100,100,30);
+        buttonRestart.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String resultS = (String)JOptionPane.showInputDialog
+                (
+                    frame,
+                    "Input the size of grid",
+                    "Restart",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    null, "4"
+                );
+
+                frame.dispose();
+
+                gridSize = Integer.parseInt(resultS);
+                setup();
+            }
+        });
+        frame.add(buttonRestart);
+    }
+
+    public static void addDestroyButton()
+    {
+        JButton buttonDestroy = new JButton("Destroy a tile");
+        buttonDestroy.setBounds(25,140,100,30);
+        buttonDestroy.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String resultS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the x coordinate of tile",
+                                "Destroy a tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                buttonDestroy.setVisible(false);
+                frame.repaint();
+            }
+        });
+        frame.add(buttonDestroy);
     }
 
     /**
@@ -61,7 +127,7 @@ public class Game extends JPanel implements KeyListener
         {
             for (int j = 0; j < gridSize; j++)
             {
-                drawTile(g, j * 60 + (windowWidth - gridLength) / 2 + 10,
+                drawTile(g, grid.tileArray[i][j], j * 60 + (windowWidth - gridLength) / 2 + 10,
                         i * 60 + (windowHeight - gridLength) / 2 + 10);
             }
         }
@@ -70,30 +136,26 @@ public class Game extends JPanel implements KeyListener
     /**
      * draw a tile with corresponding color and value at designated position
      * @param g     the graphics tool
-//     * @param tile     the tile to draw
+     * @param value     the value of tile
      * @param x     x coordinate to draw at
      * @param y     y coordinate to draw at
      */
-    //second param Tile tile
-    public void drawTile(Graphics g, int x, int y)
+    public void drawTile(Graphics g, int value, int x, int y)
     {
-//        int tileValue = tile.getValue();
-        int tileValue = 0;
-
         Graphics2D g2 = (Graphics2D)g;
 
-        if (tileValue > 0)
+        if (value > 0)
         {
 //            g2.setColor(tile.getColor());
             g2.setColor(Color.cyan);
-            g2.fillRoundRect(x, y, 50, 50, 5, 5);
+            g2.fillRect(x, y, 50, 50);
             g2.setColor(Color.black);
-            g.drawString("" + tileValue, x + 25, y + 25);
+            g.drawString("" + value, x + 20 - Integer.toString(value).length() * 2, y + 30);
         }
         else
         {
             g2.setColor(Color.lightGray);
-            g2.fillRoundRect(x, y, 50, 50, 5, 5);
+            g2.fillRect(x, y, 50, 50);
             g2.setColor(Color.black);
         }
     }
