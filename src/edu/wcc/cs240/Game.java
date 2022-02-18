@@ -11,14 +11,18 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.1
- * 00:15 Feb/18/2022 PST
+ * @version 0.2
+ * added multiple descriptions and instructions for group members
+ * 07:21 Feb/18/2022 PST
  */
 public class Game extends JPanel implements KeyListener
 {
     static Game game;
     static JFrame frame;
     static Grid grid;
+    /** \　　/
+     * 【 ﾟ∀ﾟ】< Change the initial grid size here
+     */
     static int gridSize = 4;
     static int windowHeight;
     static int windowWidth;
@@ -29,17 +33,22 @@ public class Game extends JPanel implements KeyListener
     }
 
     /**
-     * set up GUI based on the given grid size
+     * set up grid based on the given grid size, tiles, and buttons
      */
     public static void setup()
     {
         game = new Game();
         frame = new JFrame("2048 Game");
         grid = new Grid(gridSize);
-//        grid.tileArray[0][0] = 2;
+        /** \　　/
+         * 【 ﾟ∀ﾟ】< Test by manually changing tile value here, the line below is an example
+         * first zero(x coordinate) stands for the leftmost column,
+         * second zero(y coordinate) stands for the uppermost line
+         */
+        //grid.tileArray[0][0] = 2;
 
         //leave space between window border and grid border
-        windowWidth = 50 * gridSize + 400;
+        windowWidth = 50 * gridSize + 500;
         windowHeight = 50 * gridSize + 200;
 
         frame.addKeyListener(game);
@@ -60,7 +69,9 @@ public class Game extends JPanel implements KeyListener
     public static void addRestartButton()
     {
         JButton buttonRestart = new JButton("Restart");
-        buttonRestart.setBounds(25,100,100,30);
+        buttonRestart.setBounds(15,100,150,30);
+        //make the button not focusable so key listener work properly
+        buttonRestart.setFocusable(false);
         buttonRestart.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
@@ -75,10 +86,24 @@ public class Game extends JPanel implements KeyListener
                     null, "4"
                 );
 
-                frame.dispose();
+                //In case the user press 'cancel' or input value smaller than 4 in the dialog box
+                if (resultS != null)
+                {
+                    int newGridSize = Integer.parseInt(resultS);
+                    if (newGridSize >= 4)
+                    {
+                        //close the old window before setting up a new one
+                        frame.dispose();
 
-                gridSize = Integer.parseInt(resultS);
-                setup();
+                        gridSize = newGridSize;
+                        setup();
+
+                        /** \　　/
+                         * 【 ﾟ∀ﾟ】< You can tell whether the restart button is working properly by checking the console
+                         */
+                        System.out.println("Restarted");
+                    }
+                }
             }
         });
         frame.add(buttonRestart);
@@ -87,12 +112,14 @@ public class Game extends JPanel implements KeyListener
     public static void addDestroyButton()
     {
         JButton buttonDestroy = new JButton("Destroy a tile");
-        buttonDestroy.setBounds(25,140,100,30);
+        buttonDestroy.setBounds(15,140,150,30);
+        //make the button not focusable so key listener work properly
+        buttonDestroy.setFocusable(false);
         buttonDestroy.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent e)
             {
-                String resultS = (String)JOptionPane.showInputDialog
+                String resultXS = (String)JOptionPane.showInputDialog
                         (
                                 frame,
                                 "Input the x coordinate of tile",
@@ -103,15 +130,47 @@ public class Game extends JPanel implements KeyListener
                                 ""
                         );
 
-                buttonDestroy.setVisible(false);
-                frame.repaint();
+                String resultYS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the y coordinate of tile",
+                                "Destroy a tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                //In case the user press 'cancel' or input value(s) out of bounds in the dialog box
+                if (resultXS != null && resultYS != null)
+                {
+                    int x = Integer.parseInt(resultXS);
+                    int y = Integer.parseInt(resultYS);
+
+                    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
+                    {
+                        /** \　　/
+                         * 【 ﾟ∀ﾟ】< Cancan, please remove '//' in front of grid.destroy(x, y) after you finish it in
+                         * Grid.java
+                         * You can tell whether the destroy methods has been called by checking the console, 'Destroyed'
+                         * will be printed
+                         */
+                        //grid.destroy(x, y);
+
+                        //Hide the button after using the function for once
+                        buttonDestroy.setVisible(false);
+                        frame.repaint();
+
+                        System.out.println("Destroyed");
+                    }
+                }
             }
         });
         frame.add(buttonDestroy);
     }
 
     /**
-     * paint grid, tiles, descriptions, and buttons
+     * paint grid and tiles
      * @param g     the graphics tool
      */
     public void paint(Graphics g)
@@ -146,8 +205,12 @@ public class Game extends JPanel implements KeyListener
 
         if (value > 0)
         {
-//            g2.setColor(tile.getColor());
+            /** \　　/
+             * 【 ﾟ∀ﾟ】< Yushi, please remove g2.setColor(Color.cyan); and '//' in front of g2.setColor(colorOf(value));
+             * after you finish colorOf method in this class
+             */
             g2.setColor(Color.cyan);
+            //g2.setColor(colorOf(value));
             g2.fillRect(x, y, 50, 50);
             g2.setColor(Color.black);
             g.drawString("" + value, x + 20 - Integer.toString(value).length() * 2, y + 30);
@@ -160,18 +223,66 @@ public class Game extends JPanel implements KeyListener
         }
     }
 
+    /**
+     * not required
+     * @param e     n/a
+     */
     @Override
     public void keyTyped(KeyEvent e)
     {
 
     }
 
+    /**
+     * press w, s, a, d to move tiles around
+     * @param e     key press event
+     */
+
+    /** \　　/
+     * 【 ﾟ∀ﾟ】< Jacqueline, please remove '//' in front of grid.up(), grid.down(), grid.left(), grid.right() after you
+     * finish them in Grid.java
+     */
+
+    /** \　　/
+     * 【 ﾟ∀ﾟ】< Jialei, please remove '//' in front of grid.spawn() after you finish it in Grid.java
+     */
     @Override
     public void keyPressed(KeyEvent e)
     {
-
+        char keyPressed = e.getKeyChar();
+        switch (keyPressed)
+        {
+            case 'w':
+                //grid.up();
+                //grid.spawn();
+                frame.repaint();
+                System.out.println("w");
+                break;
+            case 's':
+                //grid.down();
+                //grid.spawn();
+                frame.repaint();
+                System.out.println("s");
+                break;
+            case 'a':
+                //grid.left();
+                //grid.spawn();
+                frame.repaint();
+                System.out.println("a");
+                break;
+            case 'd':
+                //grid.right();
+                //grid.spawn();
+                frame.repaint();
+                System.out.println("d");
+                break;
+        }
     }
 
+    /**
+     * not required
+     * @param e     n/a
+     */
     @Override
     public void keyReleased(KeyEvent e)
     {
