@@ -11,9 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.2
- * added multiple descriptions and instructions for group members
- * 07:21 Feb/18/2022 PST
+ * @version 0.3
+ * fixed x and y being opposite in paint method
+ * 07:47 Feb/18/2022 PST
  */
 public class Game extends JPanel implements KeyListener
 {
@@ -45,7 +45,7 @@ public class Game extends JPanel implements KeyListener
          * first zero(x coordinate) stands for the leftmost column,
          * second zero(y coordinate) stands for the uppermost line
          */
-        //grid.tileArray[0][0] = 2;
+        grid.tileArray[0][1] = 2;
 
         //leave space between window border and grid border
         windowWidth = 50 * gridSize + 500;
@@ -186,8 +186,8 @@ public class Game extends JPanel implements KeyListener
         {
             for (int j = 0; j < gridSize; j++)
             {
-                drawTile(g, grid.tileArray[i][j], j * 60 + (windowWidth - gridLength) / 2 + 10,
-                        i * 60 + (windowHeight - gridLength) / 2 + 10);
+                drawTile(g, grid.tileArray[i][j], i * 60 + (windowWidth - gridLength) / 2 + 10,
+                        j * 60 + (windowHeight - gridLength) / 2 + 10);
             }
         }
     }
