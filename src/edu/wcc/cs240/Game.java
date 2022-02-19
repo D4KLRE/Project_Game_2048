@@ -11,9 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.4
- * added different color for different values of tile and spawn method
- * 21:46 Feb/18/2022 PST
+ * @version 0.5
+ * added destroy and doubleTile method to Grid class
+ * 20:25 Feb/18/2022 PST
  */
 public class Game extends JPanel implements KeyListener
 {
@@ -158,7 +158,7 @@ public class Game extends JPanel implements KeyListener
                          * You can tell whether the destroy methods has been called by checking the console, 'Destroyed'
                          * will be printed
                          */
-                        //grid.destroy(x, y);
+                        grid.destroy(x, y);
 
                         //Hide the button after using the function for once
                         buttonDestroy.setVisible(false);
@@ -212,7 +212,7 @@ public class Game extends JPanel implements KeyListener
 
                     if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
                     {
-                        //grid.double(x, y);
+                        grid.doubleTile(x, y);
 
                         //Hide the button after using the function for once
                         buttonDestroy.setVisible(false);

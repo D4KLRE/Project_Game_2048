@@ -40,6 +40,14 @@ public class Grid
                 spawn = true;
             }
         }while (!spawn);
+    }
 
+    public void destroy(int x, int y) {
+        tileArray[x-1][y-1] = 0;
+    }
+
+    public void doubleTile(int x, int y)
+    {
+        tileArray[x-1][y-1] *= 2;
     }
 }
