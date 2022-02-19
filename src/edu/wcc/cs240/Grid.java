@@ -24,4 +24,22 @@ public class Grid
             }
         }
     }
+
+    public void spawn()
+    {
+        boolean spawn = false;
+        do
+        {
+            int x = (int)(Math.random()*Game.gridSize);
+            int y = (int)(Math.random()*Game.gridSize);
+            if (tileArray[x][y] == 0)
+            {
+                //int value = (int)Math.pow(2, (int)(Math.random()*11));
+                //System.out.println(value);
+                tileArray[x][y] = 2;
+                spawn = true;
+            }
+        }while (!spawn);
+
+    }
 }

@@ -11,9 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.3
- * fixed x and y being opposite in paint method
- * 07:47 Feb/18/2022 PST
+ * @version 0.4
+ * added different color for different values of tile and spawn method
+ * 21:46 Feb/18/2022 PST
  */
 public class Game extends JPanel implements KeyListener
 {
@@ -45,7 +45,7 @@ public class Game extends JPanel implements KeyListener
          * first zero(x coordinate) stands for the leftmost column,
          * second zero(y coordinate) stands for the uppermost line
          */
-        grid.tileArray[0][1] = 2;
+        //grid.tileArray[3][3] = 2;
 
         //leave space between window border and grid border
         windowWidth = 50 * gridSize + 500;
@@ -60,6 +60,9 @@ public class Game extends JPanel implements KeyListener
 
         addRestartButton();
         addDestroyButton();
+        addDoubleButton();
+
+        grid.spawn();
 
 //        JTextField textField = new JTextField("" + gridSize);
 //        textField.setBounds(25,140,100,30);
@@ -169,6 +172,60 @@ public class Game extends JPanel implements KeyListener
         frame.add(buttonDestroy);
     }
 
+    public static void addDoubleButton()
+    {
+        JButton buttonDestroy = new JButton("Double a tile");
+        buttonDestroy.setBounds(15,180,150,30);
+        //make the button not focusable so key listener work properly
+        buttonDestroy.setFocusable(false);
+        buttonDestroy.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String resultXS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the x coordinate of tile",
+                                "Double a tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                String resultYS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the y coordinate of tile",
+                                "Double a tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                //In case the user press 'cancel' or input value(s) out of bounds in the dialog box
+                if (resultXS != null && resultYS != null)
+                {
+                    int x = Integer.parseInt(resultXS);
+                    int y = Integer.parseInt(resultYS);
+
+                    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
+                    {
+                        //grid.double(x, y);
+
+                        //Hide the button after using the function for once
+                        buttonDestroy.setVisible(false);
+                        frame.repaint();
+
+                        System.out.println("Doubled");
+                    }
+                }
+            }
+        });
+        frame.add(buttonDestroy);
+    }
+
     /**
      * paint grid and tiles
      * @param g     the graphics tool
@@ -209,8 +266,33 @@ public class Game extends JPanel implements KeyListener
              * 【 ﾟ∀ﾟ】< Yushi, please remove g2.setColor(Color.cyan); and '//' in front of g2.setColor(colorOf(value));
              * after you finish colorOf method in this class
              */
-            g2.setColor(Color.cyan);
-            //g2.setColor(colorOf(value));
+            Color color = new Color(255,255,255);
+            switch(value)
+            {
+                case 2: color = new Color(255, 235, 205);
+                    break;
+                case 4: color = new Color(252, 230, 201);
+                    break;
+                case 8: color = new Color(245, 222, 179);
+                    break;
+                case 16: color = new Color(227, 207, 87);
+                    break;
+                case 32: color = new Color(255, 215, 0);
+                    break;
+                case 64: color = new Color(255, 255, 0);
+                    break;
+                case 128: color = new Color(255, 153, 18);
+                    break;
+                case 256: color = new Color(235, 142, 85);
+                    break;
+                case 512: color = new Color(237, 145, 33);
+                    break;
+                case 1024: color = new Color(255, 128, 0);
+                    break;
+                case 2048: color = new Color(255, 0, 0);
+                    break;
+            }
+            g2.setColor(color);
             g2.fillRect(x, y, 50, 50);
             g2.setColor(Color.black);
             g.drawString("" + value, x + 20 - Integer.toString(value).length() * 2, y + 30);
@@ -254,25 +336,25 @@ public class Game extends JPanel implements KeyListener
         {
             case 'w':
                 //grid.up();
-                //grid.spawn();
+                grid.spawn();
                 frame.repaint();
                 System.out.println("w");
                 break;
             case 's':
                 //grid.down();
-                //grid.spawn();
+                grid.spawn();
                 frame.repaint();
                 System.out.println("s");
                 break;
             case 'a':
                 //grid.left();
-                //grid.spawn();
+                grid.spawn();
                 frame.repaint();
                 System.out.println("a");
                 break;
             case 'd':
                 //grid.right();
-                //grid.spawn();
+                grid.spawn();
                 frame.repaint();
                 System.out.println("d");
                 break;
