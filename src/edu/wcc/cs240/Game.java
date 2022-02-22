@@ -11,15 +11,24 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.5
- * added destroy and doubleTile method to Grid class
- * 20:25 Feb/18/2022 PST
+ * @version 0.6
+ * added todolist
+ * 07:23 Feb/22/2022 PST
+ * todo:
+ *  1. better spawn (rand effi & multi spawn & spawn 4 or +)    Ting
+ *  2. move                                                     Jacqueline
+ *  3. merge (include game over)                                Yushi
+ *  4. add description                                          Cancan
+ *  5. display score & highest score                            Cancan
+ *  6. spawn a "2" manually                                     Cancan
+ *  7. move/merge                                               Jialei
  */
 public class Game extends JPanel implements KeyListener
 {
     static Game game;
     static JFrame frame;
     static Grid grid;
+    static int highestScore;
     /** \　　/
      * 【 ﾟ∀ﾟ】< Change the initial grid size here
      */
@@ -45,7 +54,7 @@ public class Game extends JPanel implements KeyListener
          * first zero(x coordinate) stands for the leftmost column,
          * second zero(y coordinate) stands for the uppermost line
          */
-        //grid.tileArray[3][3] = 2;
+        grid.tileArray[0][1] = 2048;
 
         //leave space between window border and grid border
         windowWidth = 50 * gridSize + 500;
@@ -295,7 +304,7 @@ public class Game extends JPanel implements KeyListener
             g2.setColor(color);
             g2.fillRect(x, y, 50, 50);
             g2.setColor(Color.black);
-            g.drawString("" + value, x + 20 - Integer.toString(value).length() * 2, y + 30);
+            g.drawString("" + value, x + 22 - Integer.toString(value).length() * 2, y + 30);
         }
         else
         {
@@ -336,6 +345,7 @@ public class Game extends JPanel implements KeyListener
         {
             case 'w':
                 //grid.up();
+//                grid.merge();
                 grid.spawn();
                 frame.repaint();
                 System.out.println("w");
