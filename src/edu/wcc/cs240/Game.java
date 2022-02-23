@@ -11,17 +11,17 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.6
- * added todolist
- * 07:23 Feb/22/2022 PST
+ * @version 0.7
+ * added up, down, left, right method and improved spawn method
+ * 23:46 Feb/22/2022 PST
  * todo:
- *  1. better spawn (rand effi & multi spawn & spawn 4 or +)    Ting
- *  2. move                                                     Jacqueline
- *  3. merge (include game over)                                Yushi
- *  4. add description                                          Cancan
- *  5. display score & highest score                            Cancan
- *  6. spawn a "2" manually                                     Cancan
- *  7. move/merge                                               Jialei
+ *  1. better spawn (spawn 4 or +)          Ting
+ *  2. move                                 Jacqueline
+ *  3. merge (include game over             Yushi
+ *  4. add                                  Cancan
+ *  5. display score & highest score        Cancan
+ *  6. spawn a "2" manually                 Cancan
+ *  7. move/merge                           Jialei
  */
 public class Game extends JPanel implements KeyListener
 {
@@ -29,6 +29,7 @@ public class Game extends JPanel implements KeyListener
     static JFrame frame;
     static Grid grid;
     static int highestScore;
+    static int numTileSpawn = 1;
     /** \　　/
      * 【 ﾟ∀ﾟ】< Change the initial grid size here
      */
@@ -71,6 +72,7 @@ public class Game extends JPanel implements KeyListener
         addDestroyButton();
         addDoubleButton();
 
+
         grid.spawn();
 
 //        JTextField textField = new JTextField("" + gridSize);
@@ -108,6 +110,7 @@ public class Game extends JPanel implements KeyListener
                         frame.dispose();
 
                         gridSize = newGridSize;
+                        numTileSpawn = gridSize / 4;
                         setup();
 
                         /** \　　/
@@ -256,6 +259,8 @@ public class Game extends JPanel implements KeyListener
                         j * 60 + (windowHeight - gridLength) / 2 + 10);
             }
         }
+
+        //g2.drawString( "2048", 250, 20 );
     }
 
     /**
@@ -344,26 +349,26 @@ public class Game extends JPanel implements KeyListener
         switch (keyPressed)
         {
             case 'w':
-                //grid.up();
+                grid.up();
 //                grid.merge();
                 grid.spawn();
                 frame.repaint();
                 System.out.println("w");
                 break;
             case 's':
-                //grid.down();
+                grid.down();
                 grid.spawn();
                 frame.repaint();
                 System.out.println("s");
                 break;
             case 'a':
-                //grid.left();
+                grid.left();
                 grid.spawn();
                 frame.repaint();
                 System.out.println("a");
                 break;
             case 'd':
-                //grid.right();
+                grid.right();
                 grid.spawn();
                 frame.repaint();
                 System.out.println("d");
