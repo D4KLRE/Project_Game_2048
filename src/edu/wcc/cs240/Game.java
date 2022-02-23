@@ -11,9 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.7
- * added up, down, left, right method and improved spawn method
- * 23:46 Feb/22/2022 PST
+ * @version 0.8
+ * added description on GUI and spawn a "2" tile button
+ * 06:08 Feb/23/2022 PST
  * todo:
  *  1. better spawn (spawn 4 or +)          Ting
  *  2. move                                 Jacqueline
@@ -71,7 +71,7 @@ public class Game extends JPanel implements KeyListener
         addRestartButton();
         addDestroyButton();
         addDoubleButton();
-
+        addSpawn2Button();
 
         grid.spawn();
 
@@ -238,6 +238,60 @@ public class Game extends JPanel implements KeyListener
         frame.add(buttonDestroy);
     }
 
+    public static void addSpawn2Button()
+    {
+        JButton buttonSpawn2 = new JButton("Spawn a \"2\" tile");
+        buttonSpawn2.setBounds(15,220,150,30);
+        //make the button not focusable so key listener work properly
+        buttonSpawn2.setFocusable(false);
+        buttonSpawn2.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                String resultXS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the x coordinate of tile",
+                                "Spawn a \"2\" tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                String resultYS = (String)JOptionPane.showInputDialog
+                        (
+                                frame,
+                                "Input the y coordinate of tile",
+                                "Spawn a \"2\" tile",
+                                JOptionPane.PLAIN_MESSAGE,
+                                null,
+                                null,
+                                ""
+                        );
+
+                //In case the user press 'cancel' or input value(s) out of bounds in the dialog box
+                if (resultXS != null && resultYS != null)
+                {
+                    int x = Integer.parseInt(resultXS);
+                    int y = Integer.parseInt(resultYS);
+
+                    if (x >= 0 && x < gridSize && y >= 0 && y < gridSize && grid.tileArray[x][y] == 0 )
+                    {
+                        grid.spawn2Tile(x, y);
+
+                        //Hide the button after using the function for once
+                        buttonSpawn2.setVisible(false);
+                        frame.repaint();
+
+                        System.out.println("Spawn2");
+                    }
+                }
+            }
+        });
+        frame.add(buttonSpawn2);
+    }
+
     /**
      * paint grid and tiles
      * @param g     the graphics tool
@@ -245,6 +299,22 @@ public class Game extends JPanel implements KeyListener
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
+
+        g2.setColor(Color.black);
+        g2.drawString( "2048", 325, 30 );
+        g2.drawString( "Score:", 30, 30 );
+        g2.drawString( "highestScore:" + highestScore, 30, 50 );
+//        g2.drawString( "Introduce the button:", 10, 265 );
+        g2.drawString( "Restart to change grid size.",15,277);
+//        g2.drawString( "Destroy can arbitrarily",10,289);
+//        g2.drawString( "   restore grid.",10,301);
+//        g2.drawString( "3.Double can make",10,313);
+//        g2.drawString( "   arbitrarily square *2.",10,325);
+//        g2.drawString( "4.Spawn2 can add 2 in ",10,337);
+//        g2.drawString( "   arbitrary space.",10,349);
+//        Font font = new Font("宋体", Font.BOLD, 70);
+        g2.setColor(Color.blue);
+        g2.drawString( "Use W, S, A, D to move/merge tiles", 400, 30 );
 
         //leave space between tiles
         int gridLength = 60 * gridSize + 10;

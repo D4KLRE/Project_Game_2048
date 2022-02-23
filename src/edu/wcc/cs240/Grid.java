@@ -56,7 +56,7 @@ public class Grid
                     //int value = (int)Math.pow(2, (int)(Math.random()*11));
                     //System.out.println(value);
                     tileArray[x][y] = 2;
-                    System.out.println("'2' tile spawned at " + (x+1) + ", " + (y+1));
+                    System.out.println("'2' tile spawned at " + x + ", " + y);
                     spawned++;
                 }
                 else
@@ -139,11 +139,16 @@ public class Grid
     }
 
     public void destroy(int x, int y) {
-        tileArray[x-1][y-1] = 0;
+        tileArray[x][y] = 0;
     }
 
     public void doubleTile(int x, int y)
     {
-        tileArray[x-1][y-1] *= 2;
+        tileArray[x][y] *= 2;
+    }
+
+    public void spawn2Tile(int x, int y)
+    {
+        tileArray[x][y] = 2;
     }
 }
