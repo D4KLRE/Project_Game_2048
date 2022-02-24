@@ -1,21 +1,25 @@
 package edu.wcc.cs240;
 
-/**
- * the grid class
- * contains methods to move tiles around, spawn new tiles, and use consumables
- */
-
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 /** \　　/
  * 【 ﾟ∀ﾟ】< Cancan, Jacqueline, Jialei, this is where you should write your code, please don't touch code in Game.java
  * except removing '//' in front of the method you write in this java file
  */
+
+/**
+ * the grid class
+ * contains methods to move/merge tiles, spawn new tiles, and use consumables
+ */
 public class Grid
 {
     int[][] tileArray;
 
+    /**
+     * construct a grid with given size
+     * @param gridSize size of new grid
+     * @author Ting Gao
+     */
     public Grid(int gridSize)
     {
         tileArray = new int[gridSize][gridSize];
@@ -28,6 +32,13 @@ public class Grid
         }
     }
 
+    /**
+     * spawn one or more "2" tile (number of tile spawned = (int) size of grid / 4) at random empty position, nonempty
+     * position won't be selected twice
+     * WIP: spawn tile larger than 2 occasionally based on highest value on the grid, merge method with the highest
+     *      value record required
+     * @author Ting Gao
+     */
     public void spawn()
     {
         //Create an array list to store each position in grid. Delete the randomly selected position if it's not empty,
@@ -46,6 +57,7 @@ public class Grid
                 break;
             }
 
+                //randomly select a position from the array containing all position excepts confirmed nonempty ones
                 int pos = (int)(Math.random()*posArrList.size());
                 //Convert one-dimensional position to two-dimensional position
                 int x = posArrList.get(pos) % Game.gridSize;
@@ -53,170 +65,192 @@ public class Grid
 
                 if (tileArray[x][y] == 0)
                 {
-                    //int value = (int)Math.pow(2, (int)(Math.random()*11));
-                    //System.out.println(value);
                     tileArray[x][y] = 2;
                     System.out.println("'2' tile spawned at " + x + ", " + y);
                     spawned++;
                 }
                 else
                 {
-//                System.out.println(posArrList.get(pos) + " at index " + pos + " removed.");
-//                System.out.println("x: " + x + " y: " + y);
+                    //remove confirmed nonempty position from the array, so it won't be randomly selected again
                     posArrList.remove(pos);
-//                System.out.println("Size of posArrList remained: " + posArrList.size());
+//                  System.out.println(posArrList.get(pos) + " at index " + pos + " removed.");
+//                  System.out.println("x: " + x + " y: " + y);
+//                  System.out.println("Size of posArrList remained: " + posArrList.size());
 
                 }
             }while (spawned < Game.numTileSpawn);
     }
 
-
-    public void left() {
-        for (int i = 0; i < tileArray.length; i++) {
-            for (int x = i; x >= 1; x--) {
-                for (int y = 0; y < tileArray.length; y++) {
-                    if (tileArray[x - 1][y] == tileArray[x][y] && tileArray[x][y] != 0) {
-                        tileArray[x - 1][y] *= 2;
-                        tileArray[x][y] = 0;
-                    }
-                    if (tileArray[x - 1][y] == 0) {
-                        tileArray[x - 1][y] = tileArray[x][y];
-                        tileArray[x][y] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    public void up() {
-        for (int i = 0; i < tileArray.length; i++) {
-            for (int y = i; y >= 1; y--) {
-                for (int x = 0; x < tileArray.length; x++) {
-                    if (tileArray[x][y - 1] == tileArray[x][y] && tileArray[x][y] != 0) {
-                        tileArray[x][y - 1] *= 2;
-                        tileArray[x][y] = 0;
-                    }
-                    if (tileArray[x][y - 1] == 0) {
-                        tileArray[x][y - 1] = tileArray[x][y];
-                        tileArray[x][y] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    public void down() {
-        for (int i = tileArray.length - 2; i >= 0; i--) {
-            for (int y = i; y < tileArray.length - 1; y++) {
-                for (int x = 0; x < tileArray.length; x++) {
-                    if (tileArray[x][y] == tileArray[x][y + 1] && tileArray[x][y + 1] != 0) {
-                        tileArray[x][y + 1] *= 2;
-                        tileArray[x][y] = 0;
-                    }
-                    if (tileArray[x][y + 1] == 0) {
-                        tileArray[x][y + 1] = tileArray[x][y];
-                        tileArray[x][y] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    public void right() {
-        for (int i = tileArray.length - 2; i >= 0; i--) {
-            for (int x = i; x < tileArray.length - 1; x++) {
-                for (int y = 0; y < tileArray.length; y++) {
-                    if (tileArray[x + 1][y] == tileArray[x][y] && tileArray[x + 1][y] != 0) {
-                        tileArray[x + 1][y] *= 2;
-                        tileArray[x][y] = 0;
-                    }
-                    if (tileArray[x + 1][y] == 0) {
-                        tileArray[x + 1][y] = tileArray[x][y];
-                        tileArray[x][y] = 0;
-                    }
-                }
-            }
-        }
-    }
-
-    //    public void up(){
-//        for (int col = 0; col < Game.gridSize; col++) { //start from first col, filter each column
-//            int emptyPosPointer = 0; // parameter of empty tile
-//            for (int row = 0; row < Game.gridSize; row++) { //filter each row in the column
-//                if (tileArray[col][emptyPosPointer] != 0){
-//                    emptyPosPointer++;
+//    public void up() {
+//        for (int i = 0; i < tileArray.length; i++) {
+//            for (int y = i; y >= 1; y--) {
+//                for (int x = 0; x < tileArray.length; x++) {
+//                    if (tileArray[x][y - 1] == tileArray[x][y] && tileArray[x][y] != 0) {
+//                        tileArray[x][y - 1] *= 2;
+//                        tileArray[x][y] = 0;
+//                    }
+//                    if (tileArray[x][y - 1] == 0) {
+//                        tileArray[x][y - 1] = tileArray[x][y];
+//                        tileArray[x][y] = 0;
+//                    }
 //                }
-//                else if (tileArray[col][row] != 0) {
-//                    tileArray[col][emptyPosPointer] = tileArray[col][row];
-//                    //empty the original tile position after tile is moved
-//                    tileArray[col][row] = 0;
-//                    emptyPosPointer++;
+//            }
+//        }
+//    }
+//
+//    public void down() {
+//        for (int i = tileArray.length - 2; i >= 0; i--) {
+//            for (int y = i; y < tileArray.length - 1; y++) {
+//                for (int x = 0; x < tileArray.length; x++) {
+//                    if (tileArray[x][y] == tileArray[x][y + 1] && tileArray[x][y + 1] != 0) {
+//                        tileArray[x][y + 1] *= 2;
+//                        tileArray[x][y] = 0;
+//                    }
+//                    if (tileArray[x][y + 1] == 0) {
+//                        tileArray[x][y + 1] = tileArray[x][y];
+//                        tileArray[x][y] = 0;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    public void left() {
+//        for (int i = 0; i < tileArray.length; i++) {
+//            for (int x = i; x >= 1; x--) {
+//                for (int y = 0; y < tileArray.length; y++) {
+//                    if (tileArray[x - 1][y] == tileArray[x][y] && tileArray[x][y] != 0) {
+//                        tileArray[x - 1][y] *= 2;
+//                        tileArray[x][y] = 0;
+//                    }
+//                    if (tileArray[x - 1][y] == 0) {
+//                        tileArray[x - 1][y] = tileArray[x][y];
+//                        tileArray[x][y] = 0;
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    public void right() {
+//        for (int i = tileArray.length - 2; i >= 0; i--) {
+//            for (int x = i; x < tileArray.length - 1; x++) {
+//                for (int y = 0; y < tileArray.length; y++) {
+//                    if (tileArray[x + 1][y] == tileArray[x][y] && tileArray[x + 1][y] != 0) {
+//                        tileArray[x + 1][y] *= 2;
+//                        tileArray[x][y] = 0;
+//                    }
+//                    if (tileArray[x + 1][y] == 0) {
+//                        tileArray[x + 1][y] = tileArray[x][y];
+//                        tileArray[x][y] = 0;
+//                    }
 //                }
 //            }
 //        }
 //    }
 
+    /**
+     * trying to move tiles up
+     * @author Jacqueline Tan
+     */
+    public void up(){
+        for (int col = 0; col < Game.gridSize; col++) { //start from first col, filter each column
+            int emptyPosPointer = 0; // parameter of empty tile
+            for (int row = 0; row < Game.gridSize; row++) { //filter each row in the column
+                if (tileArray[col][emptyPosPointer] != 0){
+                    emptyPosPointer++;
+                }
+                else if (tileArray[col][row] != 0) {
+                    tileArray[col][emptyPosPointer] = tileArray[col][row];
+                    //empty the original tile position after tile is moved
+                    tileArray[col][row] = 0;
+                    emptyPosPointer++;
+                }
+            }
+        }
+    }
 
-//    public void down(){  //start from first col, filter each column
-//        for (int col = 0; col < Game.gridSize; col++) {
-//            int emptyPosPointer = Game.gridSize-1; // parameter of empty tile
-//            for (int row = Game.gridSize-1; row >= 0; row--) { //filter each row in the column
-//                if (tileArray[col][emptyPosPointer] != 0){
-//                    emptyPosPointer--;
-//                }
-//                else if (tileArray[col][row] != 0) {
-//                    tileArray[col][emptyPosPointer] = tileArray[col][row];
-//                    //empty the original tile position after tile is moved
-//                    tileArray[col][row] = 0;
-//                    emptyPosPointer--;
-//                }
-//            }
-//        }
-//    }
+    /**
+     * trying to move tiles down
+     * @author Jacqueline Tan
+     */
+    public void down(){  //start from first col, filter each column
+        for (int col = 0; col < Game.gridSize; col++) {
+            int emptyPosPointer = Game.gridSize-1; // parameter of empty tile
+            for (int row = Game.gridSize-1; row >= 0; row--) { //filter each row in the column
+                if (tileArray[col][emptyPosPointer] != 0){
+                    emptyPosPointer--;
+                }
+                else if (tileArray[col][row] != 0) {
+                    tileArray[col][emptyPosPointer] = tileArray[col][row];
+                    //empty the original tile position after tile is moved
+                    tileArray[col][row] = 0;
+                    emptyPosPointer--;
+                }
+            }
+        }
+    }
 
-//    public void left(){
-//        for (int row = 0; row < Game.gridSize; row++) { //start from first row, filter each row
-//            int emptyPosPointer = 0; // parameter of empty tile
-//            for (int col = 0; col < Game.gridSize; col++) { //filter each tile in row
-//                if (tileArray[emptyPosPointer][row] != 0){
-//                    emptyPosPointer++;
-//                }
-//                else if (tileArray[col][row] != 0) {
-//                    tileArray[emptyPosPointer][row] = tileArray[col][row];
-//                    //empty the original tile position after tile is moved
-//                    tileArray[col][row] = 0;
-//                    emptyPosPointer++;
-//                }
-//            }
-//        }
-//    }
+    /**
+     * trying to move tiles left
+     * @author Jacqueline Tan
+     */
+    public void left(){
+        for (int row = 0; row < Game.gridSize; row++) { //start from first row, filter each row
+            int emptyPosPointer = 0; // parameter of empty tile
+            for (int col = 0; col < Game.gridSize; col++) { //filter each tile in row
+                if (tileArray[emptyPosPointer][row] != 0){
+                    emptyPosPointer++;
+                }
+                else if (tileArray[col][row] != 0) {
+                    tileArray[emptyPosPointer][row] = tileArray[col][row];
+                    //empty the original tile position after tile is moved
+                    tileArray[col][row] = 0;
+                    emptyPosPointer++;
+                }
+            }
+        }
+    }
 
-//    public void right(){
-//        for (int row = 0; row < Game.gridSize; row++) { //start from first row, filter each row
-//            int emptyPosPointer = Game.gridSize-1; // parameter of empty tile
-//            for (int col = Game.gridSize-1; col >= 0; col--) { //filter each tile in row
-//                if (tileArray[emptyPosPointer][row] != 0){
-//                    emptyPosPointer--;
-//                }
-//                else if (tileArray[col][row] != 0) {
-//                    tileArray[emptyPosPointer][row] = tileArray[col][row];
-//                    //empty the original tile position after tile is moved
-//                    tileArray[col][row] = 0;
-//                    emptyPosPointer--;
-//                }
-//            }
-//        }
-//    }
+    /**
+     * trying to move tiles right
+     * @author Jacqueline Tan
+     */
+    public void right(){
+        for (int row = 0; row < Game.gridSize; row++) { //start from first row, filter each row
+            int emptyPosPointer = Game.gridSize-1; // parameter of empty tile
+            for (int col = Game.gridSize-1; col >= 0; col--) { //filter each tile in row
+                if (tileArray[emptyPosPointer][row] != 0){
+                    emptyPosPointer--;
+                }
+                else if (tileArray[col][row] != 0) {
+                    tileArray[emptyPosPointer][row] = tileArray[col][row];
+                    //empty the original tile position after tile is moved
+                    tileArray[col][row] = 0;
+                    emptyPosPointer--;
+                }
+            }
+        }
+    }
 
+    /**
+     * @author Cancan Huang
+     */
     public void destroy(int x, int y) {
         tileArray[x][y] = 0;
     }
 
+    /**
+     * @author Ting Gao
+     */
     public void doubleTile(int x, int y)
     {
         tileArray[x][y] *= 2;
     }
 
+    /**
+     * @author Cancan Huang
+     */
     public void spawn2Tile(int x, int y)
     {
         tileArray[x][y] = 2;
