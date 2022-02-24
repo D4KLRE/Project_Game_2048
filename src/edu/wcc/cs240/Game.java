@@ -11,9 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.8
- * added description on GUI and spawn a "2" tile button
- * 06:08 Feb/23/2022 PST
+ * @version 0.9
+ * added another version of up, down, left, right
+ * 06:18 Feb/24/2022 PST
  * todo:
  *  1. better spawn (spawn 4 or +)          Ting
  *  2. move                                 Jacqueline
@@ -55,7 +55,10 @@ public class Game extends JPanel implements KeyListener
          * first zero(x coordinate) stands for the leftmost column,
          * second zero(y coordinate) stands for the uppermost line
          */
-        grid.tileArray[0][1] = 2048;
+        grid.tileArray[0][0] = 2;
+        grid.tileArray[0][1] = 2;
+        grid.tileArray[0][2] = 2;
+        grid.tileArray[0][3] = 2;
 
         //leave space between window border and grid border
         windowWidth = 50 * gridSize + 500;
