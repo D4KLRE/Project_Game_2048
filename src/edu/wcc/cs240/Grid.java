@@ -81,73 +81,6 @@ public class Grid
             }while (spawned < Game.numTileSpawn);
     }
 
-//    public void up() {
-//        for (int i = 0; i < tileArray.length; i++) {
-//            for (int y = i; y >= 1; y--) {
-//                for (int x = 0; x < tileArray.length; x++) {
-//                    if (tileArray[x][y - 1] == tileArray[x][y] && tileArray[x][y] != 0) {
-//                        tileArray[x][y - 1] *= 2;
-//                        tileArray[x][y] = 0;
-//                    }
-//                    if (tileArray[x][y - 1] == 0) {
-//                        tileArray[x][y - 1] = tileArray[x][y];
-//                        tileArray[x][y] = 0;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    public void down() {
-//        for (int i = tileArray.length - 2; i >= 0; i--) {
-//            for (int y = i; y < tileArray.length - 1; y++) {
-//                for (int x = 0; x < tileArray.length; x++) {
-//                    if (tileArray[x][y] == tileArray[x][y + 1] && tileArray[x][y + 1] != 0) {
-//                        tileArray[x][y + 1] *= 2;
-//                        tileArray[x][y] = 0;
-//                    }
-//                    if (tileArray[x][y + 1] == 0) {
-//                        tileArray[x][y + 1] = tileArray[x][y];
-//                        tileArray[x][y] = 0;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    public void left() {
-//        for (int i = 0; i < tileArray.length; i++) {
-//            for (int x = i; x >= 1; x--) {
-//                for (int y = 0; y < tileArray.length; y++) {
-//                    if (tileArray[x - 1][y] == tileArray[x][y] && tileArray[x][y] != 0) {
-//                        tileArray[x - 1][y] *= 2;
-//                        tileArray[x][y] = 0;
-//                    }
-//                    if (tileArray[x - 1][y] == 0) {
-//                        tileArray[x - 1][y] = tileArray[x][y];
-//                        tileArray[x][y] = 0;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    public void right() {
-//        for (int i = tileArray.length - 2; i >= 0; i--) {
-//            for (int x = i; x < tileArray.length - 1; x++) {
-//                for (int y = 0; y < tileArray.length; y++) {
-//                    if (tileArray[x + 1][y] == tileArray[x][y] && tileArray[x + 1][y] != 0) {
-//                        tileArray[x + 1][y] *= 2;
-//                        tileArray[x][y] = 0;
-//                    }
-//                    if (tileArray[x + 1][y] == 0) {
-//                        tileArray[x + 1][y] = tileArray[x][y];
-//                        tileArray[x][y] = 0;
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     /**
      * trying to move tiles up
@@ -232,7 +165,51 @@ public class Grid
             }
         }
     }
+    
+    public void upMerge() {
+        for (int row = 1; row < Game.gridSize; row++) {
+            for (int col = 0; col < Game.gridSize; col++) {
+                if (tileArray[col][row - 1] == tileArray[col][row]) {
+                    tileArray[col][row - 1] *= 2;
+                    tileArray[col][row] = 0;
+                }
+            }
+        }
+    }
 
+    public void downMerge() {
+        for (int row = Game.gridSize - 2; row >= 0; row--) {
+            for (int col = 0; col < Game.gridSize; col++) {
+                if (tileArray[col][row + 1] == tileArray[col][row]) {
+                    tileArray[col][row + 1] *= 2;
+                    tileArray[col][row] = 0;
+                }
+            }
+        }
+    }
+
+    public void leftMerge() {
+        for (int row = 0; row < Game.gridSize; row++) {
+            for (int col = 1; col < Game.gridSize; col++) {
+                if (tileArray[col - 1][row] == tileArray[col][row]) {
+                    tileArray[col - 1][row] *= 2;
+                    tileArray[col][row] = 0;
+                }
+            }
+        }
+    }
+
+    public void rightMerge() {
+        for (int row = 0; row < Game.gridSize; row++) {
+            for (int col = Game.gridSize - 2; col >= 0; col++) {
+                if (tileArray[col + 1][row] == tileArray[col][row]) {
+                    tileArray[col + 1][row] *= 2;
+                    tileArray[col][row] = 0;
+                }
+            }
+        }
+    }
+    
     /**
      * @author Cancan Huang
      */
