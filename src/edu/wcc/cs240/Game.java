@@ -11,10 +11,9 @@ import java.awt.event.KeyListener;
  * 2048 Game
  * main method, GUI, and key interactions
  * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.10
- * added descriptions and authors to most part of the code, further improved the condition to trigger button to prevent
- * bugs
- * 08:17 Feb/24/2022 PST
+ * @version 0.12
+ * call merge methods in the keyPressed(), fixed a bug in grid.rightMerge()
+ * 23:39 Mar/4/2022 PST
  * todo:
  *  1. better spawn (spawn 4 or +)          Ting
  *  2. move                                 Jacqueline
@@ -411,27 +410,37 @@ public class Game extends JPanel implements KeyListener
                 //move tiles next to each other
                 grid.up();
                 //merge tiles with same value
-//                grid.merge();
+                grid.upMerge();
                 //space will be created if any tiles merge, compact them again
-//                grid.up();
+                grid.up();
+
                 grid.spawn();
                 frame.repaint();
                 System.out.println("W pressed");
                 break;
             case 's':
                 grid.down();
+                grid.downMerge();
+                grid.down();
+
                 grid.spawn();
                 frame.repaint();
                 System.out.println("S pressed");
                 break;
             case 'a':
                 grid.left();
+                grid.leftMerge();
+                grid.left();
+
                 grid.spawn();
                 frame.repaint();
                 System.out.println("A pressed");
                 break;
             case 'd':
                 grid.right();
+                grid.rightMerge();
+                grid.right();
+
                 grid.spawn();
                 frame.repaint();
                 System.out.println("D pressed");

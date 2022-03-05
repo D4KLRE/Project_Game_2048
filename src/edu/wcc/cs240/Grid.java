@@ -201,7 +201,7 @@ public class Grid
 
     public void rightMerge() {
         for (int row = 0; row < Game.gridSize; row++) {
-            for (int col = Game.gridSize - 2; col >= 0; col++) {
+            for (int col = Game.gridSize - 2; col >= 0; col--) {
                 if (tileArray[col + 1][row] == tileArray[col][row]) {
                     tileArray[col + 1][row] *= 2;
                     tileArray[col][row] = 0;
