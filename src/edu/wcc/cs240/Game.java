@@ -2,38 +2,32 @@ package edu.wcc.cs240;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 /**
  * 2048 Game
  * main method, GUI, and key interactions
- * @author Ting Gao, Cancan Huang, Jialei Lyu, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
- * @version 0.12
- * call merge methods in the keyPressed(), fixed a bug in grid.rightMerge()
- * 23:39 Mar/4/2022 PST
- * todo:
- *  1. better spawn (spawn 4 or +)          Ting
- *  2. move                                 Jacqueline
- *  3. merge (include game over             Yushi
- *  4. add                                  Cancan
- *  5. display score & highest score        Cancan
- *  6. spawn a "2" manually                 Cancan
- *  7. move/merge                           Jialei
+ *
+ * @author Ting Gao, Cancan Huang, Jacqueline Tan, Yushi Yao (alphabetically order of last name)
+ * @version 1.0
+ * implemented special arraylist and stack class
+ * 23:29 Mar/18/2022 PST
  */
-public class Game extends JPanel implements KeyListener
+class Game extends JPanel implements KeyListener
 {
     static Game game;
     static JFrame frame;
     static Grid grid;
+    static SaveStack saveStack;
 
-    //WIP, waiting for merge method to be added
-    static int highestScore;
+    static int highestScore = 0;
+    static int Score = 0;
+
     //number of tile spawned is based on grid size, see addRestartButton()
     static int numTileSpawn = 1;
-    /** \　　/
+    /**
+     *  \　　/
      * 【 ﾟ∀ﾟ】< Change the initial grid size here
      */
     static int gridSize = 4;
@@ -42,28 +36,39 @@ public class Game extends JPanel implements KeyListener
 
     public static void main(String[] args)
     {
+        System.out.println(FileUtils.readTxt(System.getProperty("user.dir") + "\\highestScore.txt"));
+        try
+        {
+            highestScore = Integer.parseInt(FileUtils.readTxt(System.getProperty("user.dir") + "\\highestScore.txt"));
+        }
+        catch (Exception e)
+        {
+
+        }
+
         setup();
     }
 
     /**
      * set up grid based on the given grid size, tiles, and buttons
      */
-    public static void setup()
+    private static void setup()
     {
         game = new Game();
         frame = new JFrame("2048 Game");
         grid = new Grid(gridSize);
+
         /** \　　/
          * 【 ﾟ∀ﾟ】< Test by manually changing tile value here, the line below is an example
          * first zero(x coordinate) stands for the leftmost column,
          * second zero(y coordinate) stands for the uppermost line
          */
-        grid.tileArray[0][0] = 2;
-        grid.tileArray[0][1] = 2;
-        grid.tileArray[0][2] = 2;
-        grid.tileArray[0][3] = 2;
+//        grid.tileArray[0][0] = 2;
+//        grid.tileArray[0][1] = 2;
+//        grid.tileArray[0][2] = 1024;
+//        grid.tileArray[0][3] = 16;
 
-        //Make sure window is always larger than grid
+        //Make sure window is larger than grid
         windowWidth = 50 * gridSize + 500;
         windowHeight = 50 * gridSize + 200;
 
@@ -78,30 +83,39 @@ public class Game extends JPanel implements KeyListener
         addDestroyButton();
         addDoubleButton();
         addSpawn2Button();
+        addUndoButton();
 
         grid.spawn();
+
+        //create the first save after the grid is initiated
+        SaveNode firstNode = new SaveNode(grid.tileArray);
+        saveStack = new SaveStack(firstNode);
     }
 
     /**
      * @author Ting Gao
      */
-    public static void addRestartButton()
+    private static void addRestartButton()
     {
+        Score = 0;
+
         JButton buttonRestart = new JButton("Restart");
-        buttonRestart.setBounds(15,100,150,30);
+        buttonRestart.setBounds(15, 100, 150, 30);
+
         //make the button not focusable so key listener work properly
         buttonRestart.setFocusable(false);
+
         buttonRestart.addActionListener(e ->
         {
-            String resultS = (String)JOptionPane.showInputDialog
-            (
-                frame,
-                "Input the size of grid",
-                "Restart",
-                JOptionPane.PLAIN_MESSAGE,
-                null,
-                null, "4"
-            );
+            String resultS = (String) JOptionPane.showInputDialog
+                    (
+                            frame,
+                            "Input the size of grid",
+                            "Restart",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            null, "4"
+                    );
 
             //In case the user press 'cancel' or input value smaller than 4 in the dialog box
             if (resultS != null)
@@ -123,21 +137,24 @@ public class Game extends JPanel implements KeyListener
                 }
             }
         });
+
         frame.add(buttonRestart);
     }
 
     /**
      * @author Cancan Huang, Ting Gao
      */
-    public static void addDestroyButton()
+    private static void addDestroyButton()
     {
         JButton buttonDestroy = new JButton("Destroy a tile");
-        buttonDestroy.setBounds(15,140,150,30);
+        buttonDestroy.setBounds(15, 140, 150, 30);
+
         //make the button not focusable so key listener work properly
         buttonDestroy.setFocusable(false);
+
         buttonDestroy.addActionListener(e ->
         {
-            String resultXS = (String)JOptionPane.showInputDialog
+            String resultXS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the x coordinate of tile",
@@ -148,7 +165,7 @@ public class Game extends JPanel implements KeyListener
                             ""
                     );
 
-            String resultYS = (String)JOptionPane.showInputDialog
+            String resultYS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the y coordinate of tile",
@@ -173,6 +190,8 @@ public class Game extends JPanel implements KeyListener
                      * You can tell whether the destroy methods has been called by checking the console, 'Destroyed'
                      * will be printed
                      */
+                    save();
+
                     grid.destroy(x, y);
 
                     //Hide the button after using the function for once
@@ -183,21 +202,24 @@ public class Game extends JPanel implements KeyListener
                 }
             }
         });
+
         frame.add(buttonDestroy);
     }
 
     /**
      * @author Ting Gao
      */
-    public static void addDoubleButton()
+    private static void addDoubleButton()
     {
         JButton buttonDestroy = new JButton("Double a tile");
-        buttonDestroy.setBounds(15,180,150,30);
+        buttonDestroy.setBounds(15, 180, 150, 30);
+
         //make the button not focusable so key listener work properly
         buttonDestroy.setFocusable(false);
+
         buttonDestroy.addActionListener(e ->
         {
-            String resultXS = (String)JOptionPane.showInputDialog
+            String resultXS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the x coordinate of tile",
@@ -208,7 +230,7 @@ public class Game extends JPanel implements KeyListener
                             ""
                     );
 
-            String resultYS = (String)JOptionPane.showInputDialog
+            String resultYS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the y coordinate of tile",
@@ -227,6 +249,8 @@ public class Game extends JPanel implements KeyListener
 
                 if (x >= 0 && x < gridSize && y >= 0 && y < gridSize && grid.tileArray[x][y] != 0)
                 {
+                    save();
+
                     grid.doubleTile(x, y);
 
                     //Hide the button after using the function for once
@@ -237,21 +261,24 @@ public class Game extends JPanel implements KeyListener
                 }
             }
         });
+
         frame.add(buttonDestroy);
     }
 
     /**
      * @author Cancan Huang, Ting Gao
      */
-    public static void addSpawn2Button()
+    private static void addSpawn2Button()
     {
         JButton buttonSpawn2 = new JButton("Spawn a \"2\" tile");
-        buttonSpawn2.setBounds(15,220,150,30);
+        buttonSpawn2.setBounds(15, 220, 150, 30);
+
         //make the button not focusable so key listener work properly
         buttonSpawn2.setFocusable(false);
+
         buttonSpawn2.addActionListener(e ->
         {
-            String resultXS = (String)JOptionPane.showInputDialog
+            String resultXS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the x coordinate of tile",
@@ -262,7 +289,7 @@ public class Game extends JPanel implements KeyListener
                             ""
                     );
 
-            String resultYS = (String)JOptionPane.showInputDialog
+            String resultYS = (String) JOptionPane.showInputDialog
                     (
                             frame,
                             "Input the y coordinate of tile",
@@ -279,8 +306,10 @@ public class Game extends JPanel implements KeyListener
                 int x = Integer.parseInt(resultXS);
                 int y = Integer.parseInt(resultYS);
 
-                if (x >= 0 && x < gridSize && y >= 0 && y < gridSize && grid.tileArray[x][y] == 0 )
+                if (x >= 0 && x < gridSize && y >= 0 && y < gridSize && grid.tileArray[x][y] == 0)
                 {
+                    save();
+
                     grid.spawn2Tile(x, y);
 
                     //Hide the button after using the function for once
@@ -291,28 +320,51 @@ public class Game extends JPanel implements KeyListener
                 }
             }
         });
+
         frame.add(buttonSpawn2);
+    }
+
+    private static void addUndoButton()
+    {
+        JButton buttonUndo = new JButton("Undo");
+        buttonUndo.setBounds(15, 300, 150, 30);
+
+        //make the button not focusable so key listener work properly
+        buttonUndo.setFocusable(false);
+
+        buttonUndo.addActionListener(e ->
+                load());
+
+        frame.add(buttonUndo);
     }
 
     /**
      * paint grid and tiles
-     * @param g     the graphics tool
+     *
+     * @param g the graphics tool
      * @author Ting Gao, Cancan Huang
      */
     public void paint(Graphics g)
     {
         Graphics2D g2 = (Graphics2D) g;
 
+        if (Score > highestScore)
+        {
+            FileUtils.writeTxt(System.getProperty("user.dir") + "\\highestScore.txt", Score + "");
+            highestScore = Score;
+        }
+
         g2.setColor(Color.black);
-        g2.drawString( "2048", 325, 30 );
-        g2.drawString( "Score:", 30, 30 );
-        g2.drawString( "highestScore:" + highestScore, 30, 50 );
-        g2.drawString( "Restart to change grid size.",15,277);
+        g2.drawString("2048", 325, 30);
+        g2.drawString("Score:" + Score, 30, 30);
+        g2.drawString("highestScore:" + highestScore, 30, 50);
+        g2.drawString("Restart to change grid size.", 15, 277);
         g2.setColor(Color.blue);
-        g2.drawString( "Use W, S, A, D to move/merge tiles", 400, 30 );
+        g2.drawString("Use W, S, A, D to move/merge tiles", 400, 30);
 
         //leave space between tiles
         int gridLength = 60 * gridSize + 10;
+
         g2.setColor(Color.gray);
         //keep the grid in the middle of window
         g2.fillRect((windowWidth - gridLength) / 2, (windowHeight - gridLength) / 2, gridLength, gridLength);
@@ -329,15 +381,16 @@ public class Game extends JPanel implements KeyListener
 
     /**
      * draw a tile with corresponding color and value at designated position
+     *
      * @param g     the graphics tool
-     * @param value     the value of tile
+     * @param value the value of tile
      * @param x     x coordinate to draw at
      * @param y     y coordinate to draw at
      * @author Yushi Yao, Ting Gao
      */
-    public void drawTile(Graphics g, int value, int x, int y)
+    private void drawTile(Graphics g, int value, int x, int y)
     {
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D) g;
 
         if (value > 0)
         {
@@ -345,34 +398,46 @@ public class Game extends JPanel implements KeyListener
              * 【 ﾟ∀ﾟ】< Yushi, please remove g2.setColor(Color.cyan); and '//' in front of g2.setColor(colorOf(value));
              * after you finish colorOf method in this class
              */
-            Color color = new Color(255,255,255);
-            switch(value)
+            Color color = new Color(255, 255, 255);
+            switch (value)
             {
-                case 2: color = new Color(255, 235, 205);
+                case 2:
+                    color = new Color(255, 235, 205);
                     break;
-                case 4: color = new Color(252, 230, 201);
+                case 4:
+                    color = new Color(252, 230, 201);
                     break;
-                case 8: color = new Color(245, 222, 179);
+                case 8:
+                    color = new Color(245, 222, 179);
                     break;
-                case 16: color = new Color(227, 207, 87);
+                case 16:
+                    color = new Color(227, 207, 87);
                     break;
-                case 32: color = new Color(255, 215, 0);
+                case 32:
+                    color = new Color(255, 215, 0);
                     break;
-                case 64: color = new Color(255, 255, 0);
+                case 64:
+                    color = new Color(255, 255, 0);
                     break;
-                case 128: color = new Color(255, 153, 18);
+                case 128:
+                    color = new Color(255, 153, 18);
                     break;
-                case 256: color = new Color(235, 142, 85);
+                case 256:
+                    color = new Color(235, 142, 85);
                     break;
-                case 512: color = new Color(237, 145, 33);
+                case 512:
+                    color = new Color(237, 145, 33);
                     break;
-                case 1024: color = new Color(255, 128, 0);
+                case 1024:
+                    color = new Color(255, 128, 0);
                     break;
-                case 2048: color = new Color(255, 0, 0);
+                case 2048:
+                    color = new Color(255, 0, 0);
                     break;
             }
             g2.setColor(color);
             g2.fillRect(x, y, 50, 50);
+
             g2.setColor(Color.black);
             //keep the number in the middle of tile
             g.drawString("" + value, x + 22 - Integer.toString(value).length() * 2, y + 30);
@@ -381,7 +446,6 @@ public class Game extends JPanel implements KeyListener
         {
             g2.setColor(Color.lightGray);
             g2.fillRect(x, y, 50, 50);
-            g2.setColor(Color.black);
         }
     }
 
@@ -390,13 +454,10 @@ public class Game extends JPanel implements KeyListener
      * finish them in Grid.java
      */
 
-    /** \　　/
-     * 【 ﾟ∀ﾟ】< Jialei, please remove '//' in front of grid.spawn() after you finish it in Grid.java
-     */
-
     /**
      * press w, s, a, d to move tiles around
-     * @param e     key press event
+     *
+     * @param e key press event
      * @author Ting Gao
      */
     @Override
@@ -406,6 +467,8 @@ public class Game extends JPanel implements KeyListener
         switch (keyPressed)
         {
             case 'w':
+                save();
+
                 //the below procedure takes O(N^2) time while a moveAndMerge() method could take O(N^3) time
                 //move tiles next to each other
                 grid.up();
@@ -419,6 +482,8 @@ public class Game extends JPanel implements KeyListener
                 System.out.println("W pressed");
                 break;
             case 's':
+                save();
+
                 grid.down();
                 grid.downMerge();
                 grid.down();
@@ -428,6 +493,8 @@ public class Game extends JPanel implements KeyListener
                 System.out.println("S pressed");
                 break;
             case 'a':
+                save();
+
                 grid.left();
                 grid.leftMerge();
                 grid.left();
@@ -437,6 +504,8 @@ public class Game extends JPanel implements KeyListener
                 System.out.println("A pressed");
                 break;
             case 'd':
+                save();
+
                 grid.right();
                 grid.rightMerge();
                 grid.right();
@@ -450,7 +519,8 @@ public class Game extends JPanel implements KeyListener
 
     /**
      * not required
-     * @param e     n/a
+     *
+     * @param e n/a
      */
     @Override
     public void keyReleased(KeyEvent e)
@@ -460,11 +530,28 @@ public class Game extends JPanel implements KeyListener
 
     /**
      * not required
-     * @param e     n/a
+     *
+     * @param e n/a
      */
     @Override
     public void keyTyped(KeyEvent e)
     {
 
+    }
+
+    private static void save()
+    {
+        saveStack.push(new SaveNode(grid.tileArray));
+    }
+
+    private static void load()
+    {
+        System.out.println("Undo");
+
+        if (!saveStack.isEmpty())
+        {
+            grid.tileArray = saveStack.pull().data;
+            frame.repaint();
+        }
     }
 }
